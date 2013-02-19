@@ -1,5 +1,7 @@
 package com.ferdyrodriguez.tagsapp;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Location;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -29,6 +32,8 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 	private TextView mLat;
 	private TextView mLon;
 	private Address mLastKnownAddress;
+	private static ProgressDialog pd;
+
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +51,9 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 		mLat = (TextView) getView().findViewById(R.id.latitude);
 		mLon = (TextView) getView().findViewById(R.id.longitude);
 		
+		//mContext = getApplicationContext();
+
+		
 		if (savedInstanceState != null) {
 			mLastKnownAddress = savedInstanceState.getParcelable("last_known_address");
 		if (mLastKnownAddress != null)
@@ -53,6 +61,7 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 		}
 	}
 	
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.current_location, menu);
@@ -62,18 +71,24 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.find_current_location) {
-			if (mLocationService == null)
+			if (mLocationService == null) {
+				pd = ProgressDialog.show(getActivity(), "", getString(R.string.toast_getting_loc), false);
+				pd.setCancelable(false);
 				mLocationService = new LocationService();
-			mLocationService.getLocation(getActivity(), this);
-			return true;
+				mLocationService.getLocation(getActivity(), this);            
+				return true;
+			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	public void onLocationResultAvailable(Location location) {
+		
 		if (location == null){
-			//TODO: assignment
+			//TODO: Assignment Toast/AlertDialog
+			makeToast(getString(R.string.toast_loc_error));
+			
 		} else {
 			new ReverseGeocodingService(getActivity(), this).execute(location);
 		}
@@ -82,10 +97,12 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 	@Override
 	public void onAddressAvailable(Address address) {
 		if (address == null) {
-			// TODO: assignment
+			// TODO: assignment Toast/AlertDialog
+			makeToast(getString(R.string.toast_loc_error));
 		} else {
 			mLastKnownAddress = address;
 			setAddressDetails(address);
+			pd.dismiss();
 		}
 		
 	}
@@ -106,12 +123,15 @@ public class CurrentFragment extends SherlockFragment implements LocationResultL
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 		if (mLastKnownAddress != null)
 			outState.putParcelable("last_known_address", mLastKnownAddress);
 	}
 	
-	
+	public void makeToast(String message) {
+		Activity activity = getActivity();
+	    Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+	}	
+
 
 }

@@ -8,6 +8,9 @@
     <string name="map">Map</string>
     <string name="lat_val">Lat: %1$f </string>
     <string name="lon_val">Lon: %1$f </string>
+    <string name="toast_loc_error">Could not get a Location, Please try again</string>
+    <string name="toast_getting_loc">Getting location, please wait</string>
+    
 
 
 </resources>
