@@ -1081,6 +1081,8 @@ containing a value of this type.
         public static final int lon_val=0x7f090015;
         public static final int map=0x7f090013;
         public static final int menu_settings=0x7f090010;
+        public static final int toast_getting_loc=0x7f090017;
+        public static final int toast_loc_error=0x7f090016;
     }
     public static final class style {
         /** 
